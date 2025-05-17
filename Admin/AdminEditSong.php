@@ -14,11 +14,12 @@ if (isset($_GET['id'])) {
     //     exit();
     // }
 }
-
+$artists = $song->GetAllArtists();
 // Kiểm tra nếu có dữ liệu được gửi đi
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $tenbaihat = $_POST['tenbaihat'];
-    $tencasi = $_POST['tenCaSi'];
+    $id_casi = $_POST['id_casi']; 
+    // $tencasi = $_POST['tenCaSi'];
     $theloai = $_POST['theloai'];
     $ngheSi = $_POST['ngheSi'];
     $moTa = $_POST['moTa'];
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     if ($uploadSuccess) {
         // Cập nhật CSDL
-        $update_Song = $song->UpdateSongById($tenbaihat, $theloai, $albumDB, $linknhacDB, $ngheSi, $moTa, $id);
+        $update_Song = $song->UpdateSongById($tenbaihat, $theloai, $albumDB, $linknhacDB, $ngheSi, $moTa,$id_casi, $id);
 
         if ($update_Song) {
             header("Location: AdminShowSong.php");
@@ -136,13 +137,25 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <h2>Sửa Bài Hát</h2>
     <form method="POST" enctype="multipart/form-data">
         <label>Tên Bài Hát:</label>
-        <input type="text" name="tenbaihat" value="<?php echo htmlspecialchars($result_song['tenbaihat']); ?>" required>
+        <input type="text" name="tenbaihat" value="<?php echo htmlspecialchars($result_song['tenbaihat']); ?>" >
 
         <label>Tên Ca Sĩ:</label>
-        <input type="text" name="tencasi" value="<?php echo htmlspecialchars($result_song['tenCaSi']); ?>" required>
+        <select name="id_casi" required>
+            <?php while ($artist = $artists->fetch_assoc()): ?>
+                <option value="<?php echo $artist['id_casi']; ?>" <?php echo ($artist['id_casi'] == $result_song['id_casi']) ? 'selected' : ''; ?>>
+                    <?php echo htmlspecialchars($artist['tenCaSi']); ?>
+                </option>
+            <?php endwhile; ?>
+        </select>
 
-        <label>Thể Loại:</label>
-        <input type="text" name="theloai" value="<?php echo htmlspecialchars($result_song['theloai']); ?>">
+<label>Thể Loại:</label>
+<select name="theloai" required>
+    <option value="Nhạc Trẻ" <?php echo ($result_song['theloai'] == 'Nhạc Trẻ') ? 'selected' : ''; ?>>Nhạc Trẻ</option>
+    <option value="Nhạc Đỏ" <?php echo ($result_song['theloai'] == 'Nhạc Đỏ') ? 'selected' : ''; ?>>Nhạc Đỏ</option>
+    <option value="Nhạc Rap" <?php echo ($result_song['theloai'] == 'Nhạc Rap') ? 'selected' : ''; ?>>Nhạc Rap</option>
+    <option value="Nhạc Trung" <?php echo ($result_song['theloai'] == 'Nhạc Trung') ? 'selected' : ''; ?>>Nhạc Trung</option>
+    <option value="Nhạc Âu" <?php echo ($result_song['theloai'] == 'Nhạc Âu') ? 'selected' : ''; ?>>Nhạc Âu</option>
+</select>
 
         <label>Album (Hình ảnh):</label>
         <input type="file" name="album" accept="image/*">
