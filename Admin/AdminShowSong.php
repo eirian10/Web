@@ -25,14 +25,19 @@ include '../DAO\AdminSongDAO.php';
         font-size: 50px;
 
     }
-    button {
-        width: 15%;
-        height: 50px;
-        margin-bottom:10px ;
-        background-color: blue;
-        color:#ddd;
-        font-weight: bold;
-    }
+.add {
+    display: inline-block; /* Để nút có thể căn giữa */
+    width: 15%;
+    height: 50px;
+    margin-bottom: 10px;
+    background-color: blue; /* Nền xanh */
+    color: white; /* Chữ trắng */
+    font-weight: bold;
+    border: none; /* Xóa viền nút */
+    cursor: pointer; /* Thay đổi con trỏ khi di chuột qua */
+    text-align: center; /* Căn giữa chữ trong nút */
+    line-height: 50px; /* Căn giữa chữ theo chiều dọc */
+}
     .container {
         width: 100%;
         display: flex;
@@ -86,7 +91,9 @@ include '../DAO\AdminSongDAO.php';
 <body>
 
 <h2>Danh sách bài hát</h2>
-<button>Thêm bài mới</button>
+<a href="AdminAddSong.php" class="add">
+    <button>Thêm bài mới</button>
+</a>
 <div class="container">
 <?php
 $song = new AdminSongDAO();
