@@ -1,5 +1,6 @@
 <?php
 include '../DAO/AdminSongDAO.php';
+session_start();
 
 $song = new AdminSongDAO();
 
@@ -38,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $addSong = $song->AddSong($tenbaihat, $id_casi, $theloai, $albumDB, $linknhacDB, $ngheSi, $moTa);
 
         if ($addSong) {
+            $_SESSION['message'] = "Đã thêm bài hát '$tenbaihat' thành công!";
             header("Location: AdminShowSong.php");
             exit();
         } else {
@@ -52,66 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Thêm Bài Hát Mới</title>
+    <link rel="stylesheet" type="text/css" href="../CSS/formSong.css">
+
 </head>
-<style>
-       <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
-        }
-
-        h2 {
-            text-align: center;
-            font-weight: bolder;
-            color: #333;
-        }
-
-        form {
-            background-color: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 50%;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            width: 100%;
-        }
-
-        input[type="text"],
-        input[type="file"],
-        textarea {
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        input[type="submit"] {
-            background-color: #5cb85c;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 80%;
-        }
-
-        input[type="submit"]:hover {
-            background-color: #4cae4c;
-        }
-    </style>
-</style>
 <body>
     <h2>Thêm Bài Hát Mới</h2>
     <form method="POST" enctype="multipart/form-data">
