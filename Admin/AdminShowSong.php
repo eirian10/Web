@@ -1,144 +1,102 @@
 <?php
-include '../DAO\AdminSongDAO.php';
+require_once __DIR__ . '/../DAO/AdminSongDAO.php';
+require_once __DIR__ . '/../DAO/ShowCategoryDAO.php';
+
+session_start();
+
+$song = new AdminSongDAO();
+
+// Kiểm tra và lấy thông báo từ session
+$message = isset($_SESSION['message']) ? $_SESSION['message'] : '';
+unset($_SESSION['message']); // Xóa thông báo sau khi hiển thị
+
+
+$result_song = null;
+
+
+    $totalSongs = $song->getTotalSongs();
+    $limit = 12;
+     $current_page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+    $total_page = ceil($totalSongs / $limit);
+    if ($current_page > $total_page) {
+        $current_page = $total_page;
+    } elseif ($current_page < 1) {
+        $current_page = 1;
+    }
+    $start = ($current_page - 1) * $limit;
+    $result_song = $song->getAllMusic($start, $limit);
+//  }
 ?>
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <title>Danh sách bài hát</title>
-
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 20px;
-        font-size: 12px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    h2 {
-        text-align: center;
-        color: darkslateblue;
-        font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-        font-size: 50px;
-
-    }
-.add {
-    display: inline-block; /* Để nút có thể căn giữa */
-    width: 15%;
-    height: 50px;
-    margin-bottom: 10px;
-    background-color: blue; /* Nền xanh */
-    color: white; /* Chữ trắng */
-    font-weight: bold;
-    border: none; /* Xóa viền nút */
-    cursor: pointer; /* Thay đổi con trỏ khi di chuột qua */
-    text-align: center; /* Căn giữa chữ trong nút */
-    line-height: 50px; /* Căn giữa chữ theo chiều dọc */
-}
-    .container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-    }
-
-    table {
-        width: 90%;
-        border-collapse: collapse;
-        background-color: #fff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        margin: 0 auto;
-    }
-
-    td, th {
-    word-break: break-word;
-}
-
-    th, td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        text-align: left;
-        vertical-align: top;
-    }
-
-    th {
-        background-color: #f2f2f2;
-        color: #333;
-    }
-
-    tr:hover {
-        background-color: #f1f1f1;
-    }
-
-    a {
-        text-decoration: none;
-        color: #007BFF;
-        margin-right: 10px;
-    }
-
-    a:hover {
-        text-decoration: underline;
-    }
-
-    .action-links {
-        white-space: nowrap;
-    }
-</style>
+    <link rel="stylesheet" type="text/css" href="../CSS/adminSong.css">
 
 </head>
 <body>
 
 <h2>Danh sách bài hát</h2>
-<a href="AdminAddSong.php" class="add">
+
+<!-- Thanh thông báo -->
+<div class="notification" style="position: absolute; left: 10px; top: 20px; background-color: lightyellow; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+    <?php if ($message): ?>
+        <p><?php echo htmlspecialchars($message); ?></p>
+    <?php endif; ?>
+</div>
+
+
+<a href="AdminSongAdd.php" class="add">
     <button>Thêm bài mới</button>
 </a>
+
 <div class="container">
 <?php
-$song = new AdminSongDAO();
-$result_song = $song->ShowListSong();
-if ($result_song->num_rows > 0) {
-    // Bắt đầu bảng
-    echo "<table border='1' >";
-    echo "<tr>
-            <th>ID Bài Hát</th>
-            <th>Tên Ca Sĩ</th>
-            <th>Tên Bài Hát</th>
-            <th>Thể Loại</th>
-            <th>Lượt Nghe</th>
-            <th>Album</th>
-            <th>Link Nhạc</th>
-            <th>Nghệ Sĩ</th>
-            <th style='width:40%'>Mô Tả</th>
-            <th>Tùy chỉnh</th>
-          </tr>";
-
-    // Hiển thị từng hàng dữ liệu
+if ($result_song && $result_song->num_rows > 0) {
     while ($row = $result_song->fetch_assoc()) {
-        echo "<tr>
-                <td>" . $row["id_baihat"] . "</td>
-                <td>" . $row["tenCaSi"] . "</td>
-                <td>" . $row["tenbaihat"] . "</td>
-                <td>" . $row["theloai"] . "</td>
-                <td>" . $row["luotnghe"] . "</td>
-                <td>" . $row["album"] . "</td>
-                <td>" . $row["linknhac"] . "</td>
-                <td>" . $row["ngheSi"] . "</td>
-                <td>" . $row["moTa"] . "</td>
-                <td>
-                    <a href='AdminEditSong.php?id=" . $row["id_baihat"] . "' >Sửa</a> 
-                    <a href='AdminDeleteSong.php?id=" . $row["id_baihat"] . "' onclick=\"return confirm('Bạn có chắc chắn muốn xóa bài hát này?');\">Xóa</a>
-                </td>
-
-              </tr>";
+        echo "<div class='song-card'>
+                <h3>" . htmlspecialchars($row["tenbaihat"]) . "</h3>
+                <p><strong>Ca Sĩ:</strong> " . htmlspecialchars($row["tenCaSi"]) . "</p>
+                <p><strong>Thể Loại:</strong> " . htmlspecialchars($row["theloai"]) . "</p>
+                <p><strong>Lượt Nghe:</strong> " . htmlspecialchars($row["luotnghe"]) . "</p>
+                <div class='action-links'>
+                    <a href='AdminSongEdit.php?id=" . $row["id_baihat"] . "'>Sửa</a>
+                    <a href='AdminSongDelete.php?id=" . $row["id_baihat"] . "' onclick=\"return confirm('Bạn có chắc chắn muốn xóa bài hát này?');\">Xóa</a>
+                </div>
+              </div>";
     }
-    echo "</table>";
 } else {
-    echo "0 results";
+    echo "<p>Không tìm thấy bài hát nào.</p>";
 }
-
 ?>
 </div>
+
+<div class="list-buttom">
+  <ul class="pagination">
+    <?php
+
+if ($current_page > 1 && $total_page > 1) {
+    echo '<a href="AdminSongShow.php?page=' . ($current_page - 1) . '">Prev</a> | ';
+}
+// Lặp qua các trang
+for ($i = 1; $i <= $total_page; $i++) {
+    if ($i == $current_page) {
+        echo '<span>' . $i . '</span> | ';
+    } else {
+        echo '<a href="AdminSongShow.php?page=' . $i . '">' . $i . '</a> | ';
+    }
+}
+
+// Hiển thị nút Next
+if ($current_page < $total_page && $total_page > 1) {
+    echo '<a href="AdminSongShow.php?page=' . ($current_page + 1) . '">Next</a>';
+}
+    ?>
+  </ul>
+</div>
+
+
 </body>
 </html>
