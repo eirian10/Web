@@ -1,6 +1,8 @@
 <?php 
-include_once '../Uitl/database.php';
+require_once __DIR__ . '/../Util/database.php';
 
+?>
+<?php
 class AdminSongDAO {
     private $db;
 
@@ -53,5 +55,16 @@ public function AddSong($tenbaihat, $id_casi, $theloai, $album, $linknhac, $nghe
     $result = $this->db->insert($query);
     return $result > 0;
 }
+
+public function getAllMusic($start, $limit) {
+    $query = "SELECT * FROM baihat JOIN casi ON casi.id_casi = baihat.id_casi LIMIT $start, $limit";
+    return $this->db->select($query);
+}
+public function getTotalSongs() {
+    $query = "SELECT COUNT(*) as total FROM baihat";
+    $result = $this->db->select($query);
+    return $result->fetch_assoc()['total'];
+}
+    
 }
 ?>
